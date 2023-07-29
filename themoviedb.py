@@ -1,0 +1,78 @@
+import requests
+import json
+import pandas as pd
+
+
+class findMovie:
+
+    def __init__(self):
+        self.api_url= 'https://api.themoviedb.org/3'
+        
+    def search(self,movie_name):
+        result = requests.get(self.api_url+"/search/movie?query="+movie_name+"&api_key=a8d3242dedda6fa2470f3c4dfc016d65")
+        result = json.loads(result.text)
+        return result
+    
+    def populer(self):
+        result = requests.get(self.api_url+"/movie/popular"+"?api_key=a8d3242dedda6fa2470f3c4dfc016d65")
+        result= json.loads(result.text)
+        return result
+    
+    def now_playing(self):
+        result = requests.get(self.api_url+"/movie/now_playing"+"?api_key=a8d3242dedda6fa2470f3c4dfc016d65")
+        result= json.loads(result.text)
+        return result
+    
+search_movie = findMovie()
+populer_list=[]      
+search=[]
+vizyondakiler = []
+
+while True:
+    secim=input("1- Anahtar Kelimeye Göre Arama Yap\n2- En Popüler Film Listesi\n3- Vizyondaki Film Listesi\n4- Exit\nSeçiminiz: ")
+    
+    if secim=="4":
+        break
+        
+    else:
+        if secim=="1":
+            movie_name=input("Filmin Adını Giriniz: ")
+            movie= search_movie.search(movie_name)
+            
+            for e in movie["results"]:
+                search.append([e["title"],e["vote_average"],e["popularity"]])
+            print(search)
+                #print(f'title:{e["title"]}\nvote_average:{e["vote_average"]}\npopularity:{e["popularity"]}')
+      
+        elif secim=="2":
+            populer=search_movie.populer()
+            for e in populer["results"]:
+                populer_list.append([e["title"],e["vote_average"],e["vote_count"],e["popularity"],e["release_date"]])
+            
+            print(populer_list)
+        
+                #print(f'title:{e["title"]}\nvote_average:{e["vote_average"]}\nvote_count:{e["vote_count"]}\npopularity:{e["popularity"]}\nrelease_date:{e["release_date"]}')
+        
+        elif secim=="3":
+            vizyon=search_movie.now_playing()
+            for v in vizyon["results"]:
+                vizyondakiler.append([v["title"],v["vote_average"],v["vote_count"],v["popularity"],v["release_date"]])
+            
+            print(vizyondakiler)
+            
+            
+        else:
+            print("Yanlış Seçim")
+            
+            
+column_names1 = ["title","vote_average","vote_count","popularity","release_date"]
+df = pd.DataFrame(data=populer_list,columns=column_names1)
+df
+
+column_names2 = ["title","vote_average","popularity"]
+df = pd.DataFrame(data=search,columns=column_names2)
+df
+
+column_names3 = ["title","vote_average","vote_count","popularity","release_date"]
+df = pd.DataFrame(data=vizyondakiler,columns=column_names3)
+df
